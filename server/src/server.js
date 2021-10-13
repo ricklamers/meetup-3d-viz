@@ -11,7 +11,6 @@ let players = {};
 // spec: {x: Number, y: Number, angle: Number, name: string, uuid: string, socket_id: string}
 
 io.on("connection", (socket) => {
-
   socket.on("disconnect", () => {
     // Find player based on socket.id
     for (let uuid of Object.keys(players)) {
@@ -24,13 +23,13 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("enter", ({ name, uuid }) => {
-
+  socket.on("enter", ({ name, social, uuid }) => {
     console.log("a user connected " + uuid);
 
     players[uuid] = {
       name,
       uuid,
+      social,
       x: 0,
       y: 0,
       angle: 0,
@@ -45,7 +44,8 @@ io.on("connection", (socket) => {
         x: player.x,
         y: player.y,
         angle: player.angle,
-        name: player.name
+        name: player.name,
+        social: player.social
       });
     }
   });
@@ -62,12 +62,19 @@ io.on("connection", (socket) => {
       x,
       y,
       angle,
-      uuid
     };
 
-    socket.broadcast.emit("update", { x, y, angle, uuid, name: players[uuid].name });
+    socket.broadcast.emit("update", {
+      x,
+      y,
+      angle,
+      uuid,
+      name: players[uuid].name,
+      social: players[uuid].social,
+    });
   });
 });
+
 
 server.listen(3000, () => {
   console.log("listening on *:3000");
